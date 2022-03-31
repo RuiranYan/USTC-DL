@@ -33,10 +33,14 @@ class ResNet(nn.Module):
         self.bn0 = nn.BatchNorm2d(64)
         
         ######################## task 2.2 ##########################
-        self.block1 = ResNetLayer(64,32)
-        self.block2 = ResNetLayer(32,16)
-        self.mlp1 = nn.Linear(16*16*16,512)
-        self.mlp12 = nn.Linear(512,200)
+#         self.pool1 = nn.MaxPool2d(2,2)
+        self.block1 = ResNetLayer(64,64,downsample=False)
+        self.block2 = ResNetLayer(64,128)
+        self.block3 = ResNetLayer(128,256)
+        self.block4 = ResNetLayer(256,512)
+        self.pool2 = nn.AvgPool2d(4,4,0)
+        self.mlp1 = nn.Linear(2*2*512,512)
+        self.mlp2 = nn.Linear(512,200)
 
         ########################    END   ##########################
 
@@ -46,8 +50,12 @@ class ResNet(nn.Module):
         x = F.relu(self.bn0(self.dropout(self.conv0(input))))
         
         ######################## task 2.3 ##########################
-        x = self.block1.forward(x)
-        x = self.block2.forward(x)
+#         x = self.pool1(x)
+        x = self.block1(x)
+        x = self.block2(x)
+        x = self.block3(x)
+        x = self.block4(x)
+        x = self.pool2(x)
         x = F.relu(self.mlp1(x.view(x.size(0),-1)))
         x = self.mlp2(x)
 

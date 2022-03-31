@@ -11,11 +11,18 @@ class CNN(nn.Module):
         self.bn0 = nn.BatchNorm2d(32)
         
         ######################## task 1.1 ##########################
-        self.conv1 = nn.Conv2d(32,64,3,3,1) #(64*64*32)->(22*22*64)
-        self.bn1 = nn.BatchNorm2d(16)
-        self.conv2 = nn.Conv2d(64,16,2,2,0) #(22*22*128)->(11*11*16)
-        self.bn2 = nn.BatchNorm2d(32)
-        self.mlp1 = nn.Linear(11*11*16,512)
+        self.conv1 = nn.Conv2d(32,64,3,2,1) #(32,64)
+        self.bn1 = nn.BatchNorm2d(64)
+        
+        self.conv2 = nn.Conv2d(64,128,3,2,1) #(16,128)
+        self.bn2 = nn.BatchNorm2d(128)
+        
+        self.conv3 = nn.Conv2d(128,256,3,2,1) #(8,256)
+        self.bn3 = nn.BatchNorm2d(256)
+        
+        self.pool = nn.AvgPool2d(4,4,0) #(2,256)
+        
+        self.mlp1 = nn.Linear(2*2*256,512)
         self.mlp2 = nn.Linear(512, 200)
 
         ########################    END   ##########################
@@ -25,9 +32,15 @@ class CNN(nn.Module):
         x = F.relu(self.bn0(self.dropout(self.conv0(input))))
 
         ######################## task 1.2 ##########################
-        x = F.relu(self.bn1(self.dropout(self.conv1(x))))
-        x = F.relu(self.bn2(self.dropout(self.conv2(x))))
+        
+        x = F.relu(self.bn1(self.conv1(x)))
+        x = F.relu(self.bn2(self.conv2(x)))
+        x = F.relu(self.bn3(self.conv3(x)))
+        
+        x = self.pool(x)
+        
         x = F.relu(self.mlp1(x.view(x.size(0),-1)))
+        
         x = self.mlp2(x)
         
         # Tips x = x.view(-1, 3*3*512)
