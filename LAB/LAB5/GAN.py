@@ -1,15 +1,18 @@
-# import os
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 import torch
 import torch.nn as nn
 import torchvision as tv
 from torch.autograd import Variable
-import tqdm
+from tqdm import tqdm
 import matplotlib.pyplot as plt
+import numpy as np
 plt.rcParams['font.sans-serif'] = ['SimHei']  # 显示中文标签
 plt.rcParams['axes.unicode_minus'] = False
 
 # dir = '... your path/faces/'
-dir = '/mnt/Data1/ysc/GAN'
+# dir = '/mnt/Data1/ysc/GAN'
+dir = './data/'
 # path = []
 #
 # for fileName in os.listdir(dir):
@@ -17,8 +20,8 @@ dir = '/mnt/Data1/ysc/GAN'
 
 
 noiseSize = 100     # 噪声维度
-n_generator_feature = 64        # 生成器feature map数
-n_discriminator_feature = 64        # 判别器feature map数
+n_generator_feature = 16        # 生成器feature map数
+n_discriminator_feature = 16        # 判别器feature map数
 batch_size = 256
 d_every = 1     # 每一个batch训练一次discriminator
 g_every = 5     # 每五个batch训练一次generator
@@ -72,7 +75,7 @@ class NetDiscriminator(nn.Module):
 
 
 def train():
-    for i, (image,_) in tqdm.tqdm(enumerate(dataloader)):       # type((image,_)) = <class 'list'>, len((image,_)) = 2 * 256 * 3 * 96 * 96
+    for i, (image,_) in enumerate(tqdm(dataloader)):       # type((image,_)) = <class 'list'>, len((image,_)) = 2 * 256 * 3 * 96 * 96
         real_image = Variable(image)
         real_image = real_image.cuda()
 
@@ -133,7 +136,7 @@ if __name__ == '__main__':
 
     dataset = tv.datasets.ImageFolder(dir, transform=transform)
 
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=4, drop_last=True)   # module 'torch.utils.data' has no attribute 'DataLoder'
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=1, drop_last=True)   # module 'torch.utils.data' has no attribute 'DataLoder'
 
     print('数据加载完毕！')
 
