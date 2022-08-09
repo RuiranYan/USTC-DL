@@ -8,3 +8,4 @@ data/
 .vector_cache/
 pip_packages/
 chapter7/
+*.pptx
